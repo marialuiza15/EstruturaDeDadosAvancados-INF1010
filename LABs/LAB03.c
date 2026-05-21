@@ -3,12 +3,11 @@
 
 typedef struct nodo {
     int chave;
-    int numnos;   /* número de nós da subárvore, incluindo a raiz */
+    int numnos; 
     struct nodo *esq;
     struct nodo *dir;
 } Nodo;
 
-/* Cria um novo nó */
 Nodo *criaNo(int chave) {
     Nodo *novo = (Nodo *) malloc(sizeof(Nodo));
 
@@ -25,13 +24,12 @@ Nodo *criaNo(int chave) {
     return novo;
 }
 
-/* Insere um nó na árvore binária de busca */
 Nodo *insere(Nodo *r, Nodo *novo) {
     if (r == NULL) {
         return novo;
     }
 
-    if (novo->chave < r->chave) {
+    if (r->chave > novo->chave) {
         r->esq = insere(r->esq, novo);
     } else {
         r->dir = insere(r->dir, novo);
@@ -40,19 +38,6 @@ Nodo *insere(Nodo *r, Nodo *novo) {
     return r;
 }
 
-/* Busca uma chave na árvore */
-Nodo *busca(Nodo *r, int k) {
-    while (r != NULL && r->chave != k) {
-        if (k < r->chave) {
-            r = r->esq;
-        } else {
-            r = r->dir;
-        }
-    }
-    return r;
-}
-
-/* Calcula e preenche o campo numnos de cada nó */
 int calculaNumNos(Nodo *r) {
     if (r == NULL) {
         return 0;
@@ -65,25 +50,36 @@ int calculaNumNos(Nodo *r) {
     return r->numnos;
 }
 
-/* Percurso em pré-ordem: raiz, esquerda, direita */
 void preOrdem(Nodo *r) {
-    if (r != NULL) {
-        printf("%d(%d) ", r->chave, r->numnos);
+    if (r == NULL){
+        return;
+    }   
+    printf("%d(%d) ", r->chave, r->numnos);
+
+    if (r->esq != NULL){
         preOrdem(r->esq);
+    }
+        
+    if (r->dir != NULL){
         preOrdem(r->dir);
     }
 }
 
-/* Percurso em ordem simétrica: esquerda, raiz, direita */
 void emOrdem(Nodo *r) {
-    if (r != NULL) {
+    if (r == NULL){
+        return;
+    }
+    
+    if (r->esq != NULL){
         emOrdem(r->esq);
-        printf("%d(%d) ", r->chave, r->numnos);
+    }
+    printf("%d(%d) ", r->chave, r->numnos);
+
+    if (r->dir != NULL){
         emOrdem(r->dir);
     }
 }
 
-/* Percurso por nível usando fila */
 void porNivel(Nodo *raiz) {
     if (raiz == NULL) {
         return;
@@ -114,15 +110,6 @@ void porNivel(Nodo *raiz) {
     }
 }
 
-/* Libera a memória da árvore */
-void liberaArvore(Nodo *r) {
-    if (r != NULL) {
-        liberaArvore(r->esq);
-        liberaArvore(r->dir);
-        free(r);
-    }
-}
-
 int main() {
     FILE *f;
     int valor;
@@ -142,7 +129,6 @@ int main() {
 
     fclose(f);
 
-    /* Preenche o campo numnos em todos os nós */
     calculaNumNos(raiz);
 
     printf("Pre-ordem: ");
@@ -156,8 +142,6 @@ int main() {
     printf("Por nivel: ");
     porNivel(raiz);
     printf("\n");
-
-    liberaArvore(raiz);
 
     return 0;
 }
