@@ -1,5 +1,5 @@
 /*
-INF 1010 - Estruturas de Dados Avançadas
+INF1010 - Estruturas de Dados Avançadas
 Maria Luiza Lima Bastos - 2320468
 Para compilar: gcc -O2 -o tabelahash_cpf tabelahash_cpf.c -lm
 Para rodar: ./tabelahash_cpf
@@ -10,17 +10,17 @@ Para rodar: ./tabelahash_cpf
 #include <string.h>
 #include <math.h>
 
-#define N 5147 
+#define N 4919 
 #define N2 5119 
 #define MAX_CHAVES 4096
 
 #define CSV_SAIDA "colisoes.csv"
 
-static unsigned long long tabela[N];
+unsigned long long tabela[N];
 
-static const int pesos[11] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
+const int pesos[11] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, };
 
-static int h1(unsigned long long cpf) {
+int h1(unsigned long long cpf) {
     unsigned long long soma = 0;
     unsigned long long c = cpf;
     for (int i = 10; i >= 0; i--) {
@@ -30,12 +30,12 @@ static int h1(unsigned long long cpf) {
     return (int)(soma % N);
 }
 
-static int h2(unsigned long long cpf) {
-    int r = (int)(cpf % N2);
+int h2(unsigned long long cpf) {
+    int r = (int)(cpf % N);
     return (r == 0) ? 1 : N2 - r;
 }
 
-static int inseridaserir(unsigned long long cpf) {
+int inseridaserir(unsigned long long cpf) {
     int idx   = h1(cpf);
     int passo = h2(cpf);
     int col   = 0;
@@ -50,18 +50,6 @@ static int inseridaserir(unsigned long long cpf) {
         idx = (idx + passo) % N;
     }
     return col;
-}
-
-static int buscar(unsigned long long cpf) {
-    int idx   = h1(cpf);
-    int passo = h2(cpf);
-
-    for (int k = 0; k < N; k++) {
-        if (tabela[idx] == 0) return -1;
-        if (tabela[idx] == cpf)  return idx;
-        idx = (idx + passo) % N;
-    }
-    return -1;
 }
 
 int main(void) {
@@ -97,6 +85,8 @@ int main(void) {
  
     printf("%-10s  %-20s  %-12s\n","Chaves", "Colisões", "Fator de Carga");
 
+    // metodo do quadrado e garanir que a qtd de colisoues nao ultrapasse log n
+
     int checkpoint = 100;
     int colisoes_bloco = 0; 
     int total_colisoes = 0; 
@@ -121,11 +111,9 @@ int main(void) {
  
     fclose(csv);
     printf("\nResumo final\n");
-    printf("Chaves inseridaseridas: %d\n",   total_lidos);
     printf("Colisoes totais: %d\n",   total_colisoes);
     printf("Media col/chaves: %.4f\n", (double)total_colisoes / total_lidos);
-    printf("Fator de carga: %.4f\n", (double)total_lidos / N);
-    printf("\nArquivo CSV gerado: %s\n", CSV_SAIDA);
+    printf("\nArquivo gerado: %s\n", CSV_SAIDA);
  
     return 0;
 }
