@@ -11,7 +11,7 @@ Para rodar: ./tabelahash_cpf
 #include <math.h>
 
 #define N 4919 
-#define N2 4903  
+#define N2 2447 //(4919/2 = 2.459,5 )
 #define MAX_CHAVES 4096
 
 #define CSV_SAIDA "colisoes.csv"
@@ -21,23 +21,15 @@ unsigned long long tabela[N];
 const int pesos[11] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, };
 
 int h1(unsigned long long cpf) {
-    // double A = 0.6180339887;
-    // double frac = (double)cpf*A;
-    // frac = frac - floor(frac);
-    // return (unsigned int)(N*frac);
-    unsigned long long h = 0;
-    for (int i=0; i<11; i++){
-        h = h*31ULL + cpf;
-    }
+    cpf ^= cpf >> 33;
+    cpf *= 0xff51afd7ed558ccdULL;
+    cpf ^= cpf >> 33;
+    cpf *= 0xc4ceb9fe1a85ec53ULL;
+    cpf ^= cpf >> 33;
 
-    h^=(h>>21);
-    h*=2654435761ULL;
-    h^=(h>>16);
-
-    return (unsigned int)(h%N);
-
+    return (unsigned int)(cpf % N);
 }
-// tenbtar fazer por tentativa
+
 int h2(unsigned long long cpf) {
     return (unsigned int)(N2-(cpf%N2));
 }
@@ -48,7 +40,7 @@ int inseridaserir(unsigned long long cpf) {
     int col   = 0;
 
     for (int k = 0; k < N; k++) {
-        if (tabela[idx] == 0 || tabela[idx] == 1) {
+        if (tabela[idx] == 0) {
             tabela[idx] = cpf;
             return col;
         }
