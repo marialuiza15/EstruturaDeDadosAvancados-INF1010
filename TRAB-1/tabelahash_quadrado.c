@@ -1,8 +1,8 @@
 /*
 INF1010 - Estruturas de Dados Avançadas
 Maria Luiza Lima Bastos - 2320468
-Para compilar: gcc -O2 -o tabelahash_cpf tabelahash_cpf.c -lm
-Para rodar: ./tabelahash_cpf
+Para compilar: gcc -O2 -o tabelahash_quadrado tabelahash_quadrado.c -lm
+Para rodar: ./tabelahash_quadrado
 */
 
 #include <stdio.h>
@@ -19,13 +19,10 @@ Para rodar: ./tabelahash_cpf
 unsigned long long tabela[N];
 
 int h1(unsigned long long cpf) {
-    cpf ^= cpf >> 33;
-    cpf *= 0xff51afd7ed558ccdULL;
-    cpf ^= cpf >> 33;
-    cpf *= 0xc4ceb9fe1a85ec53ULL;
-    cpf ^= cpf >> 33;
-
-    return (unsigned int)(cpf % N);
+    unsigned long long quad = (cpf * cpf);
+    unsigned long long meio = (quad >> 16);
+    
+    return (unsigned int)(meio % N);
 }
 
 int h2(unsigned long long cpf) {
