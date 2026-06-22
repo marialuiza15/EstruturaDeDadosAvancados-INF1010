@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* ── Exercício 1 ── */
+typedef struct { int n; unsigned char* v; } BitVector;
+
+BitVector* bvCompl(BitVector* a) {
+    BitVector* r = malloc(sizeof(BitVector));
+    r->n = a->n;
+    r->v = malloc(a->n);
+    for (int i = 0; i < a->n; i++)
+        r->v[i] = ~a->v[i];
+    return r;
+}
+
+/* ── Exercício 2 ── */
+typedef struct { int n; unsigned char* v; } Set;
+
+int contem(Set* A, Set* B) {
+    /* A ⊇ B  <=>  (A & B) == B */
+    for (int i = 0; i < B->n; i++) {
+        unsigned char a = (i < A->n) ? A->v[i] : 0;
+        if ((a & B->v[i]) != B->v[i])
+            return 0;
+    }
+    return 1;
+}
+
+/* ── helpers ── */
+Set* makeSet(int* elems, int count, int universo_bytes) {
+    Set* s = malloc(sizeof(Set));
+    s->n = universo_bytes;
+    s->v = calloc(universo_bytes, 1);
+    for (int i = 0; i < count; i++) {
+        int e = elems[i];
+        s->v[e / 8] |= (1 << (e % 8));
+    }
+    return s;
+}
+
+void printSet(const char* name, Set* s) {
+    printf("%s: ", name);
+    for (int i = 0; i < s->n; i++)
+        printf("%02X ", s->v[i]);
+    printf("\n");
+}
+
+int main() {
+    /* --- Teste Exercício 1 --- */
+    printf("=== Exercício 1: Complemento ===\n");
+
+    int eA[] = {0, 2, 4, 7};           /* bits ligados em A */
+    BitVector bv;
+    bv.n = 1;
+    bv.v = calloc(1, 1);
+    for (int i = 0; i < 4; i++)
+        bv.v[eA[i] / 8] |= (1 << (eA[i] % 8));
+
+    printf("A      : %02X\n", bv.v[0]);
+    BitVector* c = bvCompl(&bv);
+    printf("compl A: %02X\n", c->v[0]);   /* esperado: ~0x95 = 0x6A */
+
+    /* --- Teste Exercício 2 --- */
+    printf("\n=== Exercício 2: Contenção ===\n");
+
+    /* A = {0,1,2,3,4,5,6,7}  B = {1,3,5}  => A ⊇ B */
+    int eA2[] = {0,1,2,3,4,5,6,7};
+    int eB1[] = {1,3,5};
+    Set* A = makeSet(eA2, 8, 1);
+    Set* B1 = makeSet(eB1, 3, 1);
+    printSet("A ", A);
+    printSet("B1", B1);
+    printf("A contem B1? %s (esperado: 1)\n", contem(A, B1) ? "sim" : "nao");
+
+    /* B2 = {1,3,9}  =>  A não ⊇ B2 (9 não está em A) */
+    int eB2[] = {1,3,9};
+    Set* B2 = makeSet(eB2, 3, 2);  /* 2 bytes para cobrir elemento 9 */
+    printSet("B2", B2);
+    printf("A contem B2? %s (esperado: 0)\n", contem(A, B2) ? "sim" : "nao");
+
+    /* conjuntos de tamanhos diferentes: A com 2 bytes, B3 com 1 byte */
+    int eA3[] = {0,4,10};
+    int eB3[] = {0,4};
+    Set* A3 = makeSet(eA3, 3, 2);
+    Set* B3 = makeSet(eB3, 2, 1);
+    printSet("A3", A3);
+    printSet("B3", B3);
+    printf("A3 contem B3? %s (esperado: 1)\n", contem(A3, B3) ? "sim" : "nao");
+
+    return 0;
+}
